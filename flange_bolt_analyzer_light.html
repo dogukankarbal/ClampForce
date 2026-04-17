@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flanş Cıvata Analiz Aracı v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f5f6f8;
+    --bg2:      #ffffff;
+    --bg3:      #f0f2f5;
+    --border:   #dde1e7;
+    --border2:  #c8cdd6;
+    --text:     #1a1f2e;
+    --muted:    #6b7280;
+    --dim:      #9ca3af;
+    --accent:   #2563eb;
+    --green:    #16a34a;
+    --red:      #dc2626;
+    --amber:    #d97706;
+    --purple:   #7c3aed;
+    --mono:     'JetBrains Mono', monospace;
+    --display:  'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    z-index: 100;
+  }
+  .logo { display:flex; align-items:center; gap:12px; }
+  .logo-icon {
+    width:38px; height:38px; border-radius:8px;
+    background: linear-gradient(135deg, #1d4ed8, var(--accent));
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+  .logo-title { font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:.02em; color:var(--text); }
+  .logo-sub   { font-size:10px; color:var(--dim); letter-spacing:.06em; margin-top:2px; }
+  .mode-btns  { display:flex; gap:8px; }
+  .mode-btn {
+    padding:7px 18px; border-radius:6px; border:1px solid var(--border2);
+    background:#ffffff; color:var(--muted); font-family:var(--display);
+    font-size:12px; font-weight:500; letter-spacing:.04em; cursor:pointer; transition:all .2s;
+  }
+  .mode-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .mode-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ── Layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 370px 1fr;
+    min-height: calc(100vh - 68px);
+  }
+
+  /* ── Left Panel ── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px 18px;
+    overflow-y: auto;
+    max-height: calc(100vh - 68px);
+    position: sticky; top: 68px;
+    background: #ffffff;
+  }
+
+  /* ── Right Panel ── */
+  .panel-right {
+    padding: 22px 26px;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 20px; }
+  .section-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:600; font-family:var(--display); }
+  .section-icon  { font-size:14px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .full  { grid-column:1/-1; }
+
+  /* ── Field ── */
+  .field label {
+    display:block; font-size:11px; font-weight:500;
+    color:var(--muted); margin-bottom:5px; font-family:var(--display);
+  }
+  input[type=number], input[type=text], select {
+    width:100%; background:#ffffff; border:1px solid var(--border2);
+    border-radius:6px; color:var(--text); padding:8px 10px;
+    font-size:13px; font-family:var(--mono); outline:none;
+    transition:border-color .2s, box-shadow .2s; appearance:none;
+  }
+  input:focus, select:focus { border-color:var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  select { cursor:pointer; }
+  select option { background:#ffffff; }
+
+  /* ── Toggle ── */
+  .toggle-wrap { display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+  .toggle-track {
+    width:36px; height:20px; border-radius:10px; position:relative;
+    background:var(--border2); border:1px solid var(--border2);
+    transition:background .2s, border-color .2s; flex-shrink:0;
+  }
+  .toggle-track.on { background:var(--accent); border-color:var(--accent); }
+  .toggle-thumb {
+    width:14px; height:14px; border-radius:50%; background:#fff;
+    position:absolute; top:2px; left:2px; transition:left .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-track.on .toggle-thumb { left:18px; }
+  .toggle-label { font-size:12px; color:var(--muted); font-weight:500; }
+
+  /* ── Info box ── */
+  .info-box {
+    background:var(--bg3); border:1px solid var(--border); border-radius:6px;
+    padding:10px 13px; font-size:12px; color:var(--muted); margin-top:8px;
+    line-height:1.7; font-family:var(--mono);
+  }
+  .info-box span.hi { color:var(--accent); font-weight:600; }
+
+  /* ── Error ── */
+  .error-box {
+    margin-top:12px; padding:10px 14px; background:#fef2f2;
+    border:1px solid #fecaca; border-radius:6px; color:var(--red);
+    font-size:12px; display:none;
+  }
+
+  /* ── Run button ── */
+  .run-btn {
+    width:100%; margin-top:14px; padding:12px; border-radius:8px;
+    background:var(--accent); border:none;
+    color:#fff; font-size:13px; font-weight:600; letter-spacing:.03em;
+    font-family:var(--display); cursor:pointer;
+    box-shadow:0 2px 8px rgba(37,99,235,.25); transition:background .2s, box-shadow .2s, transform .1s;
+  }
+  .run-btn:hover { background:#1d4ed8; box-shadow:0 4px 14px rgba(37,99,235,.35); }
+  .run-btn:active { transform:scale(.98); }
+
+  /* ── Empty state ── */
+  .empty {
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; height:100%; opacity:.25; gap:12px;
+  }
+  .empty-icon { font-size:64px; }
+  .empty-text { font-size:13px; letter-spacing:.06em; font-weight:500; }
+
+  /* ── Overall status ── */
+  .status-banner {
+    padding:16px 20px; border-radius:10px; margin-bottom:20px;
+    display:flex; align-items:center; justify-content:space-between;
+    border:1px solid;
+  }
+  .status-banner.ok  { background:#f0fdf4; border-color:#bbf7d0; }
+  .status-banner.nok { background:#fef2f2; border-color:#fecaca; }
+  .status-sub   { font-size:10px; letter-spacing:.10em; margin-bottom:3px; font-weight:600; text-transform:uppercase; }
+  .status-label { font-family:var(--display); font-weight:700; font-size:20px; }
+  .status-banner.ok  .status-sub   { color:#15803d; }
+  .status-banner.ok  .status-label { color:#15803d; }
+  .status-banner.nok .status-sub   { color:#b91c1c; }
+  .status-banner.nok .status-label { color:#b91c1c; }
+  .status-emoji { font-size:36px; }
+
+  /* ── Metric cards ── */
+  .metric-card {
+    background:#ffffff; border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; border-left:3px solid var(--accent);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .metric-label { font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); margin-bottom:5px; font-weight:600; }
+  .metric-value { font-size:17px; font-family:var(--mono); color:var(--text); font-weight:600; }
+  .metric-unit  { font-size:10px; color:var(--muted); margin-left:4px; }
+
+  /* ── Check block ── */
+  .checks-block {
+    background:#ffffff; border:1px solid var(--border); border-radius:10px;
+    padding:18px; margin-bottom:14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .checks-title { font-size:11px; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; margin-bottom:14px; font-weight:600; }
+  .check-row { margin-bottom:12px; }
+  .check-header {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;
+  }
+  .check-name  { font-size:12px; color:var(--text); font-weight:500; }
+  .check-badge {
+    font-size:11px; padding:2px 10px; border-radius:4px; font-family:var(--display);
+    font-weight:600; border:1px solid;
+  }
+  .check-badge.ok  { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+  .check-badge.nok { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+  .progress-bar {
+    background:var(--bg3); border-radius:3px; height:6px; overflow:hidden; margin-bottom:5px;
+  }
+  .progress-fill { height:100%; border-radius:3px; transition:width .6s ease; }
+  .check-detail { font-size:12px; color:var(--muted); font-family:var(--mono); }
+  .check-sub-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .check-sub {
+    background:var(--bg3); border-radius:6px; padding:8px 11px; border:1px solid var(--border);
+  }
+  .check-sub-label { font-size:10px; color:var(--dim); margin-bottom:3px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .check-sub-val   { font-size:13px; font-family:var(--mono); font-weight:500; color:var(--text); }
+  .divider { border:none; border-top:1px solid var(--border); margin:12px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚙</div>
+    <div>
+      <div class="logo-title">BASINÇLI TANK - CİVATA TOOL</div>
+      <div class="logo-sub">BASINÇLI TANK · VDI 2230 · EN 1591 · v2.0</div>
+    </div>
+  </div>
+  <div class="mode-btns">
+    <button class="mode-btn active" id="btn-check" onclick="setMode('check')">CHECK</button>
+    <button class="mode-btn"        id="btn-design" onclick="setMode('design')">DESIGN</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ═══════════ LEFT PANEL ═══════════ -->
+  <div class="panel-left">
+
+    <!-- Basınç & Geometri -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📐</span>
+        <span class="section-title">Basınç &amp; Geometri</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>İç Basınç (MPa)</label>
+          <input type="number" id="pressure" value="0.25" step="0.01" min="0">
+        </div>
+        <div class="field" id="wrap-nbolts">
+          <label>Cıvata Sayısı (n)</label>
+          <input type="number" id="n_bolts" value="8" step="1" min="1">
+        </div>
+        <div class="field" id="wrap-bcd" style="display:none">
+          <label>BCD — Bolt Circle (mm)</label>
+          <input type="number" id="BCD" value="240" step="1" min="1">
+        </div>
+        <div class="field">
+          <label>Conta İç Çapı (mm)</label>
+          <input type="number" id="d_inner" value="180" step="1" min="1">
+        </div>
+        <div class="field">
+          <label>Conta Dış Çapı (mm)</label>
+          <input type="number" id="d_outer" value="220" step="1" min="1">
+        </div>
+      </div>
+    </div>
+
+    <!-- Cıvata -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🔩</span>
+        <span class="section-title">Cıvata Özellikleri</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Cıvata Boyutu</label>
+          <select id="bolt_size" onchange="updateBoltInfo()">
+            <option value="M6">M6</option>
+            <option value="M8">M8</option>
+            <option value="M10">M10</option>
+            <option value="M12">M12</option>
+            <option value="M14">M14</option>
+            <option value="M16">M16</option>
+            <option value="M18">M18</option>
+            <option value="M20">M20</option>
+</select>
+        </div>
+        <div class="field">
+          <label>Mukavemet Sınıfı</label>
+          <select id="bolt_grade" onchange="updateBoltInfo()">
+            <option>4.6</option><option>5.8</option><option selected>8.8</option>
+            <option>10.9</option><option>12.9</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Ön Yük Faktörü k</label>
+          <input type="number" id="preload_factor" value="0.75" step="0.01" min="0" max="1">
+        </div>
+        <div class="field">
+          <label>Preload Kayıp Faktörü</label>
+          <input type="number" id="preload_loss" value="0.1" step="0.01" min="0" max="1">
+        </div>
+      </div>
+      <div class="info-box" id="bolt-info">—</div>
+    </div>
+
+    <!-- Güvenlik -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🛡</span>
+        <span class="section-title">Güvenlik Faktörleri</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>SF — Ayırma</label>
+          <input type="number" id="SF_sep" value="1.5" step="0.1" min="1">
+        </div>
+        <div class="field">
+          <label>SF — Gerilme</label>
+          <input type="number" id="SF_stress" value="1.2" step="0.1" min="1">
+        </div>
+        <div class="field full">
+          <label>Aralık Faktörü (× d)</label>
+          <input type="number" id="spacing_factor" value="3.0" step="0.5" min="1">
+        </div>
+      </div>
+    </div>
+
+    <!-- Rijitlik -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">⚡</span>
+        <span class="section-title">Rijitlik Modeli</span>
+      </div>
+      <div class="toggle-wrap" onclick="toggleStiffness()">
+        <div class="toggle-track" id="tog-stiffness"><div class="toggle-thumb"></div></div>
+        <span class="toggle-label">VDI φ Hesabı Aktif</span>
+      </div>
+      <div id="stiffness-c" style="margin-top:10px">
+        <div class="field">
+          <label>Sabit C Katsayısı</label>
+          <input type="number" id="C" value="0.25" step="0.01" min="0" max="1">
+        </div>
+      </div>
+      <div id="stiffness-vdi" style="margin-top:10px; display:none">
+        <div class="grid2">
+          <div class="field">
+            <label>E_bolt (MPa)</label>
+            <input type="number" id="E_bolt" value="210000" step="1000">
+          </div>
+          <div class="field">
+            <label>E_joint (MPa)</label>
+            <input type="number" id="E_joint" value="70000" step="1000">
+          </div>
+          <div class="field full">
+            <label>L_eff — Etkin Cıvata Boyu (mm)</label>
+            <input type="number" id="L_eff" value="50" step="1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Termal -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🌡</span>
+        <span class="section-title">Termal Etki</span>
+      </div>
+      <div class="toggle-wrap" onclick="toggleThermal()">
+        <div class="toggle-track" id="tog-thermal"><div class="toggle-thumb"></div></div>
+        <span class="toggle-label">Termal Hesap Aktif (VDI gerektirir)</span>
+      </div>
+      <div id="thermal-fields" style="margin-top:10px; display:none">
+        <div class="grid2">
+          <div class="field">
+            <label>ΔT (°C)</label>
+            <input type="number" id="dT" value="100" step="1">
+          </div>
+          <div class="field">
+            <label>L_joint (mm)</label>
+            <input type="number" id="L_joint" value="50" step="1">
+          </div>
+          <div class="field">
+            <label>α_bolt (×10⁻⁶ /K)</label>
+            <input type="number" id="alpha_bolt" value="12" step="1">
+          </div>
+          <div class="field">
+            <label>α_joint (×10⁻⁶ /K)</label>
+            <input type="number" id="alpha_joint" value="23" step="1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sızdırmazlık -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">💧</span>
+        <span class="section-title">Sızdırmazlık</span>
+      </div>
+      <div class="toggle-wrap" onclick="toggleSealing()">
+        <div class="toggle-track" id="tog-sealing"><div class="toggle-thumb"></div></div>
+        <span class="toggle-label">Sızdırmazlık Kontrolü Aktif</span>
+      </div>
+      <div id="sealing-fields" style="margin-top:10px; display:none">
+        <div class="field">
+          <label>Min. Conta Gerilmesi (MPa)</label>
+          <input type="number" id="p_min" value="20" step="1" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <button class="run-btn" onclick="runAnalysis()">▶ ANALİZİ ÇALIŞTIR</button>
+  </div>
+
+  <!-- ═══════════ RIGHT PANEL ═══════════ -->
+  <div class="panel-right" id="result-panel">
+    <div class="empty">
+      <div class="empty-icon">⚙</div>
+      <div class="empty-text">ANALİZ BEKLENIYOR</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  VERİTABANLARI
+// ════════════════════════════════════════
+const BOLT_DATA = {
+  M6:  {d:6,  A_s:20.1},
+  M8:  {d:8,  A_s:36.6},
+  M10: {d:10, A_s:58.0},
+  M12: {d:12, A_s:84.3},
+  M14: {d:14, A_s:115.0},
+  M16: {d:16, A_s:157.0},
+  M18: {d:18, A_s:192.0},
+  M20: {d:20, A_s:245.0},
+};
+const GRADE_DATA = {
+  "4.6":  {Rm:400,  Re:240,  proof:225},
+  "5.8":  {Rm:500,  Re:400,  proof:380},
+  "8.8":  {Rm:800,  Re:640,  proof:580},
+  "10.9": {Rm:1000, Re:900,  proof:830},
+  "12.9": {Rm:1200, Re:1080, proof:970},
+};
+
+// ════════════════════════════════════════
+//  UI STATE
+// ════════════════════════════════════════
+let mode           = "check";
+let useStiffness   = false;
+let useThermal     = false;
+let useSealing     = false;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById("btn-check").classList.toggle("active", m === "check");
+  document.getElementById("btn-design").classList.toggle("active", m === "design");
+  document.getElementById("wrap-nbolts").style.display = m === "check"  ? "" : "none";
+  document.getElementById("wrap-bcd").style.display    = m === "design" ? "" : "none";
+}
+function toggleStiffness() {
+  useStiffness = !useStiffness;
+  document.getElementById("tog-stiffness").classList.toggle("on", useStiffness);
+  document.getElementById("stiffness-c").style.display   = useStiffness ? "none" : "";
+  document.getElementById("stiffness-vdi").style.display = useStiffness ? "" : "none";
+}
+function toggleThermal() {
+  useThermal = !useThermal;
+  document.getElementById("tog-thermal").classList.toggle("on", useThermal);
+  document.getElementById("thermal-fields").style.display = useThermal ? "" : "none";
+}
+function toggleSealing() {
+  useSealing = !useSealing;
+  document.getElementById("tog-sealing").classList.toggle("on", useSealing);
+  document.getElementById("sealing-fields").style.display = useSealing ? "" : "none";
+}
+function updateBoltInfo() {
+  const bs = document.getElementById("bolt_size").value;
+  const bg = document.getElementById("bolt_grade").value;
+  const b  = BOLT_DATA[bs], g = GRADE_DATA[bg];
+  document.getElementById("bolt-info").innerHTML =
+    `<span class="hi">${bs}</span> → A<sub>s</sub> = ${b.A_s} mm² &nbsp;|&nbsp; `+
+    `<span class="hi">${bg}</span> → proof = ${g.proof} MPa &nbsp;·&nbsp; Re = ${g.Re} MPa &nbsp;·&nbsp; Rm = ${g.Rm} MPa`;
+}
+
+// ════════════════════════════════════════
+//  HESAP MOTORU
+// ════════════════════════════════════════
+function v(id) { return parseFloat(document.getElementById(id).value); }
+
+function runAnalysis() {
+  const errBox = document.getElementById("error-box");
+  errBox.style.display = "none";
+
+  try {
+    const pressure      = v("pressure");
+    const d_inner       = v("d_inner");
+    const d_outer       = v("d_outer");
+    const bolt_size     = document.getElementById("bolt_size").value;
+    const bolt_grade    = document.getElementById("bolt_grade").value;
+    const preload_k     = v("preload_factor");
+    const preload_loss  = v("preload_loss");
+    const SF_sep        = v("SF_sep");
+    const SF_str        = v("SF_stress");
+    const sp_factor     = v("spacing_factor");
+
+    if (d_inner >= d_outer) throw new Error("İç çap, dış çaptan küçük olmalıdır.");
+
+    const bolt  = BOLT_DATA[bolt_size];
+    const grade = GRADE_DATA[bolt_grade];
+    const d_mm  = bolt.d;
+    const A_s   = bolt.A_s;
+    const proof = grade.proof;
+
+    // ── Temel fizik
+    const d_eff = (d_inner + d_outer) / 2;
+    const A_eff = Math.PI / 4 * d_eff * d_eff;
+    const F_p   = pressure * A_eff;
+    const F_pre_raw = preload_k * proof * A_s;
+    let   F_pre = F_pre_raw * (1 - preload_loss);
+
+    // ── Rijitlik
+    let phi_or_C, stiffness_mode, kb = null, kj = null;
+    if (useStiffness) {
+      const E_bolt  = v("E_bolt");
+      const E_joint = v("E_joint");
+      const L_eff   = v("L_eff");
+      const t_joint = Math.max(d_outer - d_inner, 1);
+      kb = E_bolt  * A_s   / L_eff;
+      kj = E_joint * A_eff / t_joint;
+      phi_or_C = kb / (kb + kj);
+      stiffness_mode = "VDI φ";
+    } else {
+      phi_or_C = v("C");
+      stiffness_mode = "Sabit C";
+    }
+
+    // ── Termal
+    let dF_th = 0;
+    if (useThermal && useStiffness && kb !== null) {
+      const dT      = v("dT");
+      const L_joint = v("L_joint");
+      const L_eff   = v("L_eff");
+      const ab      = v("alpha_bolt") * 1e-6;
+      const aj      = v("alpha_joint") * 1e-6;
+      const dd      = (aj * L_joint - ab * L_eff) * dT;
+      dF_th = dd / (1/kb + 1/kj);
+    }
+    F_pre = F_pre + dF_th;
+
+    // ── Design modu
+    let n_bolts, design = null;
+    if (mode === "design") {
+      const BCD = v("BCD");
+      if (!BCD) throw new Error("Design modunda BCD girilmelidir.");
+      const n_min = Math.ceil(SF_sep * F_p / F_pre_raw);
+      let n_sel = Math.max(4, n_min);
+      let sp_mm = Math.PI * BCD / n_sel;
+      let sp_min = sp_factor * d_mm;
+      while (sp_mm < sp_min && n_sel < 200) { n_sel++; sp_mm = Math.PI * BCD / n_sel; }
+      design = { n_min, n_selected: n_sel,
+        spacing: { spacing: +sp_mm.toFixed(2), minimum: +sp_min.toFixed(2), ok: sp_mm >= sp_min } };
+      n_bolts = n_sel;
+    } else {
+      const n = parseInt(document.getElementById("n_bolts").value);
+      if (!n || n < 1) throw new Error("Geçerli bir cıvata sayısı giriniz.");
+      n_bolts = n;
+    }
+
+    // ── F_bolt
+    const F_bolt = F_pre + phi_or_C * (F_p / n_bolts);
+
+    // ── Kontroller
+    const sigma = F_bolt / A_s;
+    const lim   = proof / SF_str;
+    const stress = { sigma: +sigma.toFixed(2), limit: +lim.toFixed(2), util: +(sigma/lim*100).toFixed(1), ok: sigma <= lim };
+
+    const total_pre = n_bolts * F_pre;
+    const sep = { total: +total_pre.toFixed(1), fp: +F_p.toFixed(1), margin: +(total_pre - F_p).toFixed(1), ok: total_pre > F_p };
+
+    let sealing = null;
+    if (useSealing) {
+      const p_min  = v("p_min");
+      const A_gas  = Math.PI / 4 * (d_outer*d_outer - d_inner*d_inner);
+      const pg     = (total_pre - F_p) / A_gas;
+      sealing = { area: +A_gas.toFixed(2), stress: +pg.toFixed(2), required: p_min, ok: pg >= p_min };
+    }
+
+    renderResults({
+      A_eff: +A_eff.toFixed(2), F_p: +F_p.toFixed(2),
+      F_pre: +F_pre.toFixed(2), F_pre_raw: +F_pre_raw.toFixed(2),
+      phi_or_C: +phi_or_C.toFixed(4), stiffness_mode,
+      dF_th: +dF_th.toFixed(2), n_bolts, F_bolt: +F_bolt.toFixed(2),
+      stress, sep, sealing, design
+    });
+
+  } catch(e) {
+    errBox.textContent = "⚠ " + e.message;
+    errBox.style.display = "block";
+  }
+}
+
+// ════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════
+function pct(v) { return Math.min(v, 100); }
+function kN(n)  { return (n/1000).toFixed(2) + " kN"; }
+function badge(ok) {
+  return `<span class="check-badge ${ok?'ok':'nok'}">${ok?'✓ OK':'✗ NOK'}</span>`;
+}
+function barColor(u) { return u > 85 ? "#dc2626" : u > 65 ? "#d97706" : "#16a34a"; }
+
+function renderResults(r) {
+  const allOk = r.stress.ok && r.sep.ok
+    && (r.sealing ? r.sealing.ok : true)
+    && (r.design?.spacing ? r.design.spacing.ok : true);
+
+  let html = "";
+
+  // ── Status banner
+  html += `
+  <div class="status-banner ${allOk?'ok':'nok'}">
+    <div>
+      <div class="status-sub">GENEL SONUÇ</div>
+      <div class="status-label">${allOk ? "✓ KABUL EDİLEBİLİR" : "✗ KABUL EDİLEMEZ"}</div>
+    </div>
+    <div class="status-emoji">${allOk ? "✅" : "❌"}</div>
+  </div>`;
+
+  // ── Metric cards
+  html += `<div class="grid3" style="margin-bottom:18px">
+    ${mc("Etkili Alan",        r.A_eff,                "mm²",   "#2563eb")}
+    ${mc("Basınç Kuvveti",     (r.F_p/1000).toFixed(2),"kN",    "#d97706")}
+    ${mc("Ön Yük (efektif)",   (r.F_pre/1000).toFixed(2),"kN",  "#16a34a")}
+    ${mc("Cıvata Başına Yük",  (r.F_bolt/1000).toFixed(2),"kN", "#2563eb")}
+    ${mc("Rijitlik Faktörü",   r.phi_or_C,              r.stiffness_mode, "#7c3aed")}
+    ${mc("Cıvata Sayısı",      r.n_bolts,               "adet", "#16a34a")}
+  </div>`;
+
+  if (r.dF_th !== 0) {
+    html += `<div class="grid3" style="margin-bottom:18px">
+      ${mc("Termal ΔF", (r.dF_th/1000).toFixed(3), "kN", r.dF_th >= 0 ? "#dc2626" : "#16a34a")}
+    </div>`;
+  }
+
+  // ── Checks
+  html += `<div class="checks-block">
+    <div class="checks-title">🔍 Kontroller</div>`;
+
+  // [1] Gerilme
+  html += `<div class="check-row">
+    <div class="check-header">
+      <span class="check-name">[1] Gerilme Kontrolü</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:${barColor(r.stress.util)};font-family:var(--mono)">${r.stress.util}%</span>
+        ${badge(r.stress.ok)}
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${pct(r.stress.util)}%;background:${barColor(r.stress.util)}"></div>
+    </div>
+    <div class="check-detail" style="color:var(--muted)">
+      σ = <span style="color:var(--text)">${r.stress.sigma}</span> MPa &nbsp;≤&nbsp;
+      <span style="color:var(--text)">${r.stress.limit}</span> MPa (proof / SF)
+    </div>
+  </div>`;
+
+  html += `<hr class="divider">`;
+
+  // [2] Ayırma
+  html += `<div class="check-row">
+    <div class="check-header">
+      <span class="check-name">[2] Ayırma Kontrolü</span>
+      ${badge(r.sep.ok)}
+    </div>
+    <div class="check-detail" style="color:var(--muted)">
+      Marj = <span style="color:${r.sep.margin >= 0 ? '#16a34a':'#dc2626'}">${r.sep.margin > 0 ? '+':'' }${r.sep.margin} N</span>
+    </div>
+    <div class="check-sub-grid">
+      <div class="check-sub">
+        <div class="check-sub-label">TOPLAM ÖN YÜK</div>
+        <div class="check-sub-val" style="color:var(--green)">${(r.sep.total/1000).toFixed(2)} kN</div>
+      </div>
+      <div class="check-sub">
+        <div class="check-sub-label">BASINÇ KUVVETİ</div>
+        <div class="check-sub-val" style="color:var(--amber)">${(r.sep.fp/1000).toFixed(2)} kN</div>
+      </div>
+    </div>
+  </div>`;
+
+  // [3] Sızdırmazlık
+  if (r.sealing) {
+    html += `<hr class="divider">
+    <div class="check-row">
+      <div class="check-header">
+        <span class="check-name">[3] Sızdırmazlık Kontrolü</span>
+        ${badge(r.sealing.ok)}
+      </div>
+      <div class="check-detail" style="color:var(--muted)">
+        p<sub>gasket</sub> = <span style="color:var(--text)">${r.sealing.stress}</span> MPa
+        &nbsp;≥&nbsp; <span style="color:var(--text)">${r.sealing.required}</span> MPa
+      </div>
+      <div class="check-sub-grid">
+        <div class="check-sub">
+          <div class="check-sub-label">CONTA ALANI</div>
+          <div class="check-sub-val">${r.sealing.area} mm²</div>
+        </div>
+        <div class="check-sub">
+          <div class="check-sub-label">CONTA GERİLMESİ</div>
+          <div class="check-sub-val" style="color:${r.sealing.ok?'var(--green)':'var(--red)'}">${r.sealing.stress} MPa</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // [4] Spacing
+  if (r.design?.spacing) {
+    html += `<hr class="divider">
+    <div class="check-row">
+      <div class="check-header">
+        <span class="check-name">[4] Cıvata Aralığı Kontrolü</span>
+        ${badge(r.design.spacing.ok)}
+      </div>
+      <div class="check-detail" style="color:var(--muted)">
+        Aralık = <span style="color:var(--text)">${r.design.spacing.spacing}</span> mm
+        &nbsp;≥&nbsp; min <span style="color:var(--text)">${r.design.spacing.minimum}</span> mm
+      </div>
+    </div>`;
+  }
+
+  html += `</div>`;
+
+  // ── Design results
+  if (r.design) {
+    html += `<div class="checks-block">
+      <div class="checks-title">🔧 Design Mode Sonuçları</div>
+      <div class="grid3">
+        ${mc("Minimum n (ham)", r.design.n_min, "adet", "#d97706")}
+        ${mc("Seçilen n",       r.design.n_selected, "adet", "#16a34a")}
+        ${r.design.spacing ? mc("Hesaplanan Aralık", r.design.spacing.spacing, "mm", r.design.spacing.ok ? "#16a34a":"#dc2626") : ""}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById("result-panel").innerHTML = html;
+}
+
+function mc(label, value, unit, accent) {
+  return `<div class="metric-card" style="border-left-color:${accent}">
+    <div class="metric-label">${label}</div>
+    <div class="metric-value">${value}<span class="metric-unit">${unit}</span></div>
+  </div>`;
+}
+
+// ── Init
+updateBoltInfo();
+</script>
+</body>
+</html>

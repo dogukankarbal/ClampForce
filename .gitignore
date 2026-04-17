@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except these files
+!.gitignore
+!README.md
+!flange_bolt_analyzer_light.html
+!Flans_Civata_Analiz_Araci_Kullanici_Kilavuzu.docx
