@@ -1,6 +1,6 @@
-# ⚙ Flanş Cıvata Analiz Aracı v2.0
+# ⚙ ClampForce v1.0
 
-Basınçlı tank ve boru flanşlarındaki cıvata bağlantılarını **VDI 2230** ve **EN 1591** standartlarına göre analiz eden, tarayıcıda çalışan mühendislik hesap aracı.
+Basınçlı tanklar ve boru flanşlarındaki cıvata bağlantılarını **VDI 2230** ve **EN 1591** standartlarına göre analiz eden, tarayıcıda çalışan ön-mühendislik hesap aracı.
 
 > Kurulum yok. İnternet bağlantısı yok. Tek `.html` dosyası — çift tıkla, çalıştır.
 
@@ -8,7 +8,7 @@ Basınçlı tank ve boru flanşlarındaki cıvata bağlantılarını **VDI 2230*
 
 ## 🚀 Kullanım
 
-`flange_bolt_analyzer_light.html` dosyasını indirin ve tarayıcıda açın. Hepsi bu.
+`ClampForce v1.0.html` dosyasını indirin ve tarayıcıda açın. Hepsi bu.
 
 ---
 
@@ -81,7 +81,7 @@ Analiz çalıştırıldığında sağ panelde şunlar belirir:
 
 ## 📋 Detaylı Kullanıcı Kılavuzu
 
-Tam açıklamalar, örnek senaryo ve formüller için `Flans_Civata_Analiz_Araci_Kullanici_Kilavuzu.docx` dosyasına bakın.
+Tam açıklamalar, örnek senaryo ve formüller için `ClampForce v1.0 Kullanıcı Kılavuzu.docx` dosyasına bakın.
 
 ---
 
@@ -93,4 +93,4 @@ Tam açıklamalar, örnek senaryo ve formüller için `Flans_Civata_Analiz_Araci
 
 ---
 
-*VDI 2230 · EN 1591 · v2.0*
+*VDI 2230 · EN 1591 · v1.0*
