@@ -52,6 +52,28 @@
   }
   .logo-title { font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:.02em; color:var(--text); }
   .logo-sub   { font-size:10px; color:var(--dim); letter-spacing:.06em; margin-top:2px; }
+
+  /* ── Header right group ── */
+  .header-right { display:flex; align-items:center; gap:16px; }
+
+  /* ── Language toggle ── */
+  .lang-toggle {
+    display:flex; align-items:center;
+    background:var(--bg3); border:1px solid var(--border2);
+    border-radius:6px; padding:2px; gap:2px;
+  }
+  .lang-btn {
+    padding:5px 12px; border-radius:4px; border:none;
+    background:transparent; color:var(--muted);
+    font-family:var(--display); font-size:11px; font-weight:700;
+    letter-spacing:.08em; cursor:pointer; transition:all .18s;
+  }
+  .lang-btn.active {
+    background:var(--accent); color:#fff;
+    box-shadow: 0 1px 4px rgba(37,99,235,.3);
+  }
+  .lang-btn:not(.active):hover { color:var(--accent); }
+
   .mode-btns  { display:flex; gap:8px; }
   .mode-btn {
     padding:7px 18px; border-radius:6px; border:1px solid var(--border2);
@@ -92,7 +114,7 @@
     margin-bottom: 12px; padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
   }
-  .section-title { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:600; font-family:var(--display); }
+  .section-title { font-size:11px; letter-spacing:.08em; color:var(--accent); font-weight:600; font-family:var(--display); }
   .section-icon  { font-size:14px; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
@@ -171,7 +193,7 @@
   }
   .status-banner.ok  { background:#f0fdf4; border-color:#bbf7d0; }
   .status-banner.nok { background:#fef2f2; border-color:#fecaca; }
-  .status-sub   { font-size:10px; letter-spacing:.10em; margin-bottom:3px; font-weight:600; text-transform:uppercase; }
+  .status-sub   { font-size:10px; letter-spacing:.10em; margin-bottom:3px; font-weight:600; }
   .status-label { font-family:var(--display); font-weight:700; font-size:20px; }
   .status-banner.ok  .status-sub   { color:#15803d; }
   .status-banner.ok  .status-label { color:#15803d; }
@@ -185,7 +207,7 @@
     padding:12px 14px; border-left:3px solid var(--accent);
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .metric-label { font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); margin-bottom:5px; font-weight:600; }
+  .metric-label { font-size:10px; letter-spacing:.06em; color:var(--dim); margin-bottom:5px; font-weight:600; }
   .metric-value { font-size:17px; font-family:var(--mono); color:var(--text); font-weight:600; }
   .metric-unit  { font-size:10px; color:var(--muted); margin-left:4px; }
 
@@ -195,7 +217,7 @@
     padding:18px; margin-bottom:14px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .checks-title { font-size:11px; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; margin-bottom:14px; font-weight:600; }
+  .checks-title { font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:14px; font-weight:600; }
   .check-row { margin-bottom:12px; }
   .check-header {
     display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;
@@ -216,7 +238,7 @@
   .check-sub {
     background:var(--bg3); border-radius:6px; padding:8px 11px; border:1px solid var(--border);
   }
-  .check-sub-label { font-size:10px; color:var(--dim); margin-bottom:3px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .check-sub-label { font-size:10px; color:var(--dim); margin-bottom:3px; font-weight:600; letter-spacing:.04em; }
   .check-sub-val   { font-size:13px; font-family:var(--mono); font-weight:500; color:var(--text); }
   .divider { border:none; border-top:1px solid var(--border); margin:12px 0; }
 </style>
@@ -232,9 +254,16 @@
       <div class="logo-sub">VDI 2230 · EN 1591 · v1.0</div>
     </div>
   </div>
-  <div class="mode-btns">
-    <button class="mode-btn active" id="btn-check" onclick="setMode('check')">CHECK</button>
-    <button class="mode-btn"        id="btn-design" onclick="setMode('design')">DESIGN</button>
+  <div class="header-right">
+    <!-- Language Toggle -->
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="lang-tr" onclick="setLang('tr')">TR</button>
+      <button class="lang-btn"        id="lang-en" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="mode-btns">
+      <button class="mode-btn active" id="btn-check"  onclick="setMode('check')"  data-i18n="modeCheck"></button>
+      <button class="mode-btn"        id="btn-design" onclick="setMode('design')" data-i18n="modeDesign"></button>
+    </div>
   </div>
 </header>
 
@@ -243,45 +272,45 @@
   <!-- ═══════════ LEFT PANEL ═══════════ -->
   <div class="panel-left">
 
-    <!-- Basınç & Geometri -->
+    <!-- Pressure & Geometry -->
     <div class="section">
       <div class="section-header">
         <span class="section-icon">📐</span>
-        <span class="section-title">Basınç &amp; Geometri</span>
+        <span class="section-title" data-i18n="secGeometry"></span>
       </div>
       <div class="grid2">
         <div class="field">
-          <label>İç Basınç (MPa)</label>
+          <label data-i18n="lblPressure"></label>
           <input type="number" id="pressure" value="0.25" step="0.01" min="0">
         </div>
         <div class="field" id="wrap-nbolts">
-          <label>Cıvata Sayısı (n)</label>
+          <label data-i18n="lblNBolts"></label>
           <input type="number" id="n_bolts" value="8" step="1" min="1">
         </div>
         <div class="field" id="wrap-bcd" style="display:none">
-          <label>BCD — Bolt Circle (mm)</label>
+          <label data-i18n="lblBCD"></label>
           <input type="number" id="BCD" value="240" step="1" min="1">
         </div>
         <div class="field">
-          <label>Conta İç Çapı (mm)</label>
+          <label data-i18n="lblDInner"></label>
           <input type="number" id="d_inner" value="180" step="1" min="1">
         </div>
         <div class="field">
-          <label>Conta Dış Çapı (mm)</label>
+          <label data-i18n="lblDOuter"></label>
           <input type="number" id="d_outer" value="220" step="1" min="1">
         </div>
       </div>
     </div>
 
-    <!-- Cıvata -->
+    <!-- Bolt Properties -->
     <div class="section">
       <div class="section-header">
         <span class="section-icon">🔩</span>
-        <span class="section-title">Cıvata Özellikleri</span>
+        <span class="section-title" data-i18n="secBolt"></span>
       </div>
       <div class="grid2">
         <div class="field">
-          <label>Cıvata Boyutu</label>
+          <label data-i18n="lblBoltSize"></label>
           <select id="bolt_size" onchange="updateBoltInfo()">
             <option value="M6">M6</option>
             <option value="M8">M8</option>
@@ -291,62 +320,62 @@
             <option value="M16">M16</option>
             <option value="M18">M18</option>
             <option value="M20">M20</option>
-</select>
+          </select>
         </div>
         <div class="field">
-          <label>Mukavemet Sınıfı</label>
+          <label data-i18n="lblBoltGrade"></label>
           <select id="bolt_grade" onchange="updateBoltInfo()">
             <option>4.6</option><option>5.8</option><option selected>8.8</option>
             <option>10.9</option><option>12.9</option>
           </select>
         </div>
         <div class="field">
-          <label>Ön Yük Faktörü k</label>
+          <label data-i18n="lblPreloadK"></label>
           <input type="number" id="preload_factor" value="0.75" step="0.01" min="0" max="1">
         </div>
         <div class="field">
-          <label>Preload Kayıp Faktörü</label>
+          <label data-i18n="lblPreloadLoss"></label>
           <input type="number" id="preload_loss" value="0.1" step="0.01" min="0" max="1">
         </div>
       </div>
       <div class="info-box" id="bolt-info">—</div>
     </div>
 
-    <!-- Güvenlik -->
+    <!-- Safety Factors -->
     <div class="section">
       <div class="section-header">
         <span class="section-icon">🛡</span>
-        <span class="section-title">Güvenlik Faktörleri</span>
+        <span class="section-title" data-i18n="secSafety"></span>
       </div>
       <div class="grid2">
         <div class="field">
-          <label>SF — Ayırma</label>
+          <label data-i18n="lblSFSep"></label>
           <input type="number" id="SF_sep" value="1.5" step="0.1" min="1">
         </div>
         <div class="field">
-          <label>SF — Gerilme</label>
+          <label data-i18n="lblSFStr"></label>
           <input type="number" id="SF_stress" value="1.2" step="0.1" min="1">
         </div>
         <div class="field full">
-          <label>Aralık Faktörü (× d)</label>
+          <label data-i18n="lblSpacingFactor"></label>
           <input type="number" id="spacing_factor" value="3.0" step="0.5" min="1">
         </div>
       </div>
     </div>
 
-    <!-- Rijitlik -->
+    <!-- Stiffness Model -->
     <div class="section">
       <div class="section-header">
         <span class="section-icon">⚡</span>
-        <span class="section-title">Rijitlik Modeli</span>
+        <span class="section-title" data-i18n="secStiffness"></span>
       </div>
       <div class="toggle-wrap" onclick="toggleStiffness()">
         <div class="toggle-track" id="tog-stiffness"><div class="toggle-thumb"></div></div>
-        <span class="toggle-label">VDI φ Hesabı Aktif</span>
+        <span class="toggle-label" data-i18n="togStiffness"></span>
       </div>
       <div id="stiffness-c" style="margin-top:10px">
         <div class="field">
-          <label>Sabit C Katsayısı</label>
+          <label data-i18n="lblConstC"></label>
           <input type="number" id="C" value="0.25" step="0.01" min="0" max="1">
         </div>
       </div>
@@ -361,22 +390,22 @@
             <input type="number" id="E_joint" value="70000" step="1000">
           </div>
           <div class="field full">
-            <label>L_eff — Etkin Cıvata Boyu (mm)</label>
+            <label data-i18n="lblLEff"></label>
             <input type="number" id="L_eff" value="50" step="1">
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Termal -->
+    <!-- Thermal Effect -->
     <div class="section">
       <div class="section-header">
         <span class="section-icon">🌡</span>
-        <span class="section-title">Termal Etki</span>
+        <span class="section-title" data-i18n="secThermal"></span>
       </div>
       <div class="toggle-wrap" onclick="toggleThermal()">
         <div class="toggle-track" id="tog-thermal"><div class="toggle-thumb"></div></div>
-        <span class="toggle-label">Termal Hesap Aktif (VDI gerektirir)</span>
+        <span class="toggle-label" data-i18n="togThermal"></span>
       </div>
       <div id="thermal-fields" style="margin-top:10px; display:none">
         <div class="grid2">
@@ -400,19 +429,19 @@
       </div>
     </div>
 
-    <!-- Sızdırmazlık -->
+    <!-- Sealing -->
     <div class="section">
       <div class="section-header">
         <span class="section-icon">💧</span>
-        <span class="section-title">Sızdırmazlık</span>
+        <span class="section-title" data-i18n="secSealing"></span>
       </div>
       <div class="toggle-wrap" onclick="toggleSealing()">
         <div class="toggle-track" id="tog-sealing"><div class="toggle-thumb"></div></div>
-        <span class="toggle-label">Sızdırmazlık Kontrolü Aktif</span>
+        <span class="toggle-label" data-i18n="togSealing"></span>
       </div>
       <div id="sealing-fields" style="margin-top:10px; display:none">
         <div class="field">
-          <label>Min. Conta Gerilmesi (MPa)</label>
+          <label data-i18n="lblPMin"></label>
           <input type="number" id="p_min" value="20" step="1" min="0">
         </div>
       </div>
@@ -420,14 +449,14 @@
 
     <div class="error-box" id="error-box"></div>
 
-    <button class="run-btn" onclick="runAnalysis()">▶ ANALİZİ ÇALIŞTIR</button>
+    <button class="run-btn" onclick="runAnalysis()" data-i18n="btnRun"></button>
   </div>
 
   <!-- ═══════════ RIGHT PANEL ═══════════ -->
   <div class="panel-right" id="result-panel">
     <div class="empty">
       <div class="empty-icon">⚙</div>
-      <div class="empty-text">ANALİZ BEKLENIYOR</div>
+      <div class="empty-text" data-i18n="emptyState"></div>
     </div>
   </div>
 
@@ -435,7 +464,153 @@
 
 <script>
 // ════════════════════════════════════════
-//  VERİTABANLARI
+//  i18n DICTIONARY
+// ════════════════════════════════════════
+const LANG = {
+  tr: {
+    modeCheck:        "CHECK",
+    modeDesign:       "DESIGN",
+    secGeometry:      "BASINÇ & GEOMETRİ",
+    lblPressure:      "İç Basınç (MPa)",
+    lblNBolts:        "Cıvata Sayısı (n)",
+    lblBCD:           "BCD — Bolt Circle (mm)",
+    lblDInner:        "Conta İç Çapı (mm)",
+    lblDOuter:        "Conta Dış Çapı (mm)",
+    secBolt:          "CIVATA ÖZELLİKLERİ",
+    lblBoltSize:      "Cıvata Boyutu",
+    lblBoltGrade:     "Mukavemet Sınıfı",
+    lblPreloadK:      "Ön Yük Faktörü k",
+    lblPreloadLoss:   "Preload Kayıp Faktörü",
+    secSafety:        "GÜVENLİK FAKTÖRLERİ",
+    lblSFSep:         "SF — Ayırma",
+    lblSFStr:         "SF — Gerilme",
+    lblSpacingFactor: "Aralık Faktörü (× d)",
+    secStiffness:     "RİJİTLİK MODELİ",
+    togStiffness:     "VDI φ Hesabı Aktif",
+    lblConstC:        "Sabit C Katsayısı",
+    lblLEff:          "L_eff — Etkin Cıvata Boyu (mm)",
+    secThermal:       "TERMAL ETKİ",
+    togThermal:       "Termal Hesap Aktif (VDI gerektirir)",
+    secSealing:       "SIZDIRMAZLIK",
+    togSealing:       "Sızdırmazlık Kontrolü Aktif",
+    lblPMin:          "Min. Conta Gerilmesi (MPa)",
+    btnRun:           "▶ ANALİZİ ÇALIŞTIR",
+    emptyState:       "ANALİZ BEKLENİYOR",
+    // Results
+    overallResult:    "GENEL SONUÇ",
+    acceptable:       "✓ KABUL EDİLEBİLİR",
+    notAcceptable:    "✗ KABUL EDİLEMEZ",
+    mcEffArea:        "ETKİLİ ALAN",
+    mcPressForce:     "BASINÇ KUVVETİ",
+    mcPreload:        "ÖN YÜK (EFEKTİF)",
+    mcBoltLoad:       "CIVATA BAŞINA YÜK",
+    mcStiffFactor:    "RİJİTLİK FAKTÖRÜ",
+    mcBoltCount:      "CIVATA SAYISI",
+    mcThermalDF:      "TERMAL ΔF",
+    checksTitle:      "🔍 KONTROLLER",
+    checkStress:      "[1] Gerilme Kontrolü",
+    checkSep:         "[2] Ayırma Kontrolü",
+    checkSealing:     "[3] Sızdırmazlık Kontrolü",
+    checkSpacing:     "[4] Cıvata Aralığı Kontrolü",
+    margin:           "Marj",
+    totalPreload:     "TOPLAM ÖN YÜK",
+    pressureForce:    "BASINÇ KUVVETİ",
+    gasketArea:       "CONTA ALANI",
+    gasketStress:     "CONTA GERİLMESİ",
+    designTitle:      "🔧 DESIGN MODE SONUÇLARI",
+    mcMinN:           "MİNİMUM n (HAM)",
+    mcSelN:           "SEÇİLEN n",
+    mcCalcSpacing:    "HESAPLANAN ARALIK",
+    unitPcs:          "adet",
+    // Errors
+    errInnerOuter:    "İç çap, dış çaptan küçük olmalıdır.",
+    errBCD:           "Design modunda BCD girilmelidir.",
+    errNBolts:        "Geçerli bir cıvata sayısı giriniz.",
+  },
+  en: {
+    modeCheck:        "CHECK",
+    modeDesign:       "DESIGN",
+    secGeometry:      "PRESSURE & GEOMETRY",
+    lblPressure:      "Internal Pressure (MPa)",
+    lblNBolts:        "Number of Bolts (n)",
+    lblBCD:           "BCD — Bolt Circle (mm)",
+    lblDInner:        "Gasket Inner Diameter (mm)",
+    lblDOuter:        "Gasket Outer Diameter (mm)",
+    secBolt:          "BOLT PROPERTIES",
+    lblBoltSize:      "Bolt Size",
+    lblBoltGrade:     "Strength Grade",
+    lblPreloadK:      "Preload Factor k",
+    lblPreloadLoss:   "Preload Loss Factor",
+    secSafety:        "SAFETY FACTORS",
+    lblSFSep:         "SF — Separation",
+    lblSFStr:         "SF — Stress",
+    lblSpacingFactor: "Spacing Factor (× d)",
+    secStiffness:     "STIFFNESS MODEL",
+    togStiffness:     "VDI φ Calculation Active",
+    lblConstC:        "Constant C Coefficient",
+    lblLEff:          "L_eff — Effective Bolt Length (mm)",
+    secThermal:       "THERMAL EFFECT",
+    togThermal:       "Thermal Analysis Active (requires VDI)",
+    secSealing:       "SEALING",
+    togSealing:       "Sealing Check Active",
+    lblPMin:          "Min. Gasket Contact Stress (MPa)",
+    btnRun:           "▶ RUN ANALYSIS",
+    emptyState:       "AWAITING ANALYSIS",
+    // Results
+    overallResult:    "OVERALL RESULT",
+    acceptable:       "✓ ACCEPTABLE",
+    notAcceptable:    "✗ NOT ACCEPTABLE",
+    mcEffArea:        "EFFECTIVE AREA",
+    mcPressForce:     "PRESSURE FORCE",
+    mcPreload:        "PRELOAD (EFFECTIVE)",
+    mcBoltLoad:       "LOAD PER BOLT",
+    mcStiffFactor:    "STIFFNESS FACTOR",
+    mcBoltCount:      "NO. OF BOLTS",
+    mcThermalDF:      "THERMAL ΔF",
+    checksTitle:      "🔍 CHECKS",
+    checkStress:      "[1] Stress Check",
+    checkSep:         "[2] Separation Check",
+    checkSealing:     "[3] Sealing Check",
+    checkSpacing:     "[4] Bolt Spacing Check",
+    margin:           "Margin",
+    totalPreload:     "TOTAL PRELOAD",
+    pressureForce:    "PRESSURE FORCE",
+    gasketArea:       "GASKET AREA",
+    gasketStress:     "GASKET STRESS",
+    designTitle:      "🔧 DESIGN MODE RESULTS",
+    mcMinN:           "MINIMUM n (RAW)",
+    mcSelN:           "SELECTED n",
+    mcCalcSpacing:    "CALCULATED SPACING",
+    unitPcs:          "pcs",
+    // Errors
+    errInnerOuter:    "Inner diameter must be less than outer diameter.",
+    errBCD:           "BCD must be specified in Design mode.",
+    errNBolts:        "Please enter a valid number of bolts.",
+  }
+};
+
+let currentLang = "tr";
+function t(key) { return LANG[currentLang][key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById("lang-tr").classList.toggle("active", lang === "tr");
+  document.getElementById("lang-en").classList.toggle("active", lang === "en");
+  applyTranslations();
+  updateBoltInfo();
+  // Re-render results if present
+  if (lastResults) renderResults(lastResults);
+}
+
+function applyTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(key);
+  });
+}
+
+// ════════════════════════════════════════
+//  BOLT DATABASE
 // ════════════════════════════════════════
 const BOLT_DATA = {
   M6:  {d:6,  A_s:20.1},
@@ -458,10 +633,11 @@ const GRADE_DATA = {
 // ════════════════════════════════════════
 //  UI STATE
 // ════════════════════════════════════════
-let mode           = "check";
-let useStiffness   = false;
-let useThermal     = false;
-let useSealing     = false;
+let mode         = "check";
+let useStiffness = false;
+let useThermal   = false;
+let useSealing   = false;
+let lastResults  = null;
 
 function setMode(m) {
   mode = m;
@@ -496,7 +672,7 @@ function updateBoltInfo() {
 }
 
 // ════════════════════════════════════════
-//  HESAP MOTORU
+//  CALCULATION ENGINE
 // ════════════════════════════════════════
 function v(id) { return parseFloat(document.getElementById(id).value); }
 
@@ -516,7 +692,7 @@ function runAnalysis() {
     const SF_str        = v("SF_stress");
     const sp_factor     = v("spacing_factor");
 
-    if (d_inner >= d_outer) throw new Error("İç çap, dış çaptan küçük olmalıdır.");
+    if (d_inner >= d_outer) throw new Error(t("errInnerOuter"));
 
     const bolt  = BOLT_DATA[bolt_size];
     const grade = GRADE_DATA[bolt_grade];
@@ -524,14 +700,14 @@ function runAnalysis() {
     const A_s   = bolt.A_s;
     const proof = grade.proof;
 
-    // ── Temel fizik
+    // ── Core physics
     const d_eff = (d_inner + d_outer) / 2;
     const A_eff = Math.PI / 4 * d_eff * d_eff;
     const F_p   = pressure * A_eff;
     const F_pre_raw = preload_k * proof * A_s;
     let   F_pre = F_pre_raw * (1 - preload_loss);
 
-    // ── Rijitlik
+    // ── Stiffness
     let phi_or_C, stiffness_mode, kb = null, kj = null;
     if (useStiffness) {
       const E_bolt  = v("E_bolt");
@@ -544,10 +720,11 @@ function runAnalysis() {
       stiffness_mode = "VDI φ";
     } else {
       phi_or_C = v("C");
-      stiffness_mode = "Sabit C";
+      stiffness_mode = t("lblConstC").replace(" (× d)", "").replace(" Coefficient","").replace(" Katsayısı","");
+      stiffness_mode = currentLang === "tr" ? "Sabit C" : "Const C";
     }
 
-    // ── Termal
+    // ── Thermal
     let dF_th = 0;
     if (useThermal && useStiffness && kb !== null) {
       const dT      = v("dT");
@@ -560,11 +737,11 @@ function runAnalysis() {
     }
     F_pre = F_pre + dF_th;
 
-    // ── Design modu
+    // ── Design mode
     let n_bolts, design = null;
     if (mode === "design") {
       const BCD = v("BCD");
-      if (!BCD) throw new Error("Design modunda BCD girilmelidir.");
+      if (!BCD) throw new Error(t("errBCD"));
       const n_min = Math.ceil(SF_sep * F_p / F_pre_raw);
       let n_sel = Math.max(4, n_min);
       let sp_mm = Math.PI * BCD / n_sel;
@@ -575,14 +752,14 @@ function runAnalysis() {
       n_bolts = n_sel;
     } else {
       const n = parseInt(document.getElementById("n_bolts").value);
-      if (!n || n < 1) throw new Error("Geçerli bir cıvata sayısı giriniz.");
+      if (!n || n < 1) throw new Error(t("errNBolts"));
       n_bolts = n;
     }
 
     // ── F_bolt
     const F_bolt = F_pre + phi_or_C * (F_p / n_bolts);
 
-    // ── Kontroller
+    // ── Checks
     const sigma = F_bolt / A_s;
     const lim   = proof / SF_str;
     const stress = { sigma: +sigma.toFixed(2), limit: +lim.toFixed(2), util: +(sigma/lim*100).toFixed(1), ok: sigma <= lim };
@@ -598,13 +775,15 @@ function runAnalysis() {
       sealing = { area: +A_gas.toFixed(2), stress: +pg.toFixed(2), required: p_min, ok: pg >= p_min };
     }
 
-    renderResults({
+    lastResults = {
       A_eff: +A_eff.toFixed(2), F_p: +F_p.toFixed(2),
       F_pre: +F_pre.toFixed(2), F_pre_raw: +F_pre_raw.toFixed(2),
       phi_or_C: +phi_or_C.toFixed(4), stiffness_mode,
       dF_th: +dF_th.toFixed(2), n_bolts, F_bolt: +F_bolt.toFixed(2),
       stress, sep, sealing, design
-    });
+    };
+
+    renderResults(lastResults);
 
   } catch(e) {
     errBox.textContent = "⚠ " + e.message;
@@ -633,36 +812,36 @@ function renderResults(r) {
   html += `
   <div class="status-banner ${allOk?'ok':'nok'}">
     <div>
-      <div class="status-sub">GENEL SONUÇ</div>
-      <div class="status-label">${allOk ? "✓ KABUL EDİLEBİLİR" : "✗ KABUL EDİLEMEZ"}</div>
+      <div class="status-sub">${t("overallResult")}</div>
+      <div class="status-label">${allOk ? t("acceptable") : t("notAcceptable")}</div>
     </div>
     <div class="status-emoji">${allOk ? "✅" : "❌"}</div>
   </div>`;
 
   // ── Metric cards
   html += `<div class="grid3" style="margin-bottom:18px">
-    ${mc("Etkili Alan",        r.A_eff,                "mm²",   "#2563eb")}
-    ${mc("Basınç Kuvveti",     (r.F_p/1000).toFixed(2),"kN",    "#d97706")}
-    ${mc("Ön Yük (efektif)",   (r.F_pre/1000).toFixed(2),"kN",  "#16a34a")}
-    ${mc("Cıvata Başına Yük",  (r.F_bolt/1000).toFixed(2),"kN", "#2563eb")}
-    ${mc("Rijitlik Faktörü",   r.phi_or_C,              r.stiffness_mode, "#7c3aed")}
-    ${mc("Cıvata Sayısı",      r.n_bolts,               "adet", "#16a34a")}
+    ${mc(t("mcEffArea"),       r.A_eff,                    "mm²",   "#2563eb")}
+    ${mc(t("mcPressForce"),    (r.F_p/1000).toFixed(2),    "kN",    "#d97706")}
+    ${mc(t("mcPreload"),       (r.F_pre/1000).toFixed(2),  "kN",    "#16a34a")}
+    ${mc(t("mcBoltLoad"),      (r.F_bolt/1000).toFixed(2), "kN",    "#2563eb")}
+    ${mc(t("mcStiffFactor"),   r.phi_or_C,                  r.stiffness_mode, "#7c3aed")}
+    ${mc(t("mcBoltCount"),     r.n_bolts,                   t("unitPcs"), "#16a34a")}
   </div>`;
 
   if (r.dF_th !== 0) {
     html += `<div class="grid3" style="margin-bottom:18px">
-      ${mc("Termal ΔF", (r.dF_th/1000).toFixed(3), "kN", r.dF_th >= 0 ? "#dc2626" : "#16a34a")}
+      ${mc(t("mcThermalDF"), (r.dF_th/1000).toFixed(3), "kN", r.dF_th >= 0 ? "#dc2626" : "#16a34a")}
     </div>`;
   }
 
   // ── Checks
   html += `<div class="checks-block">
-    <div class="checks-title">🔍 Kontroller</div>`;
+    <div class="checks-title">${t("checksTitle")}</div>`;
 
-  // [1] Gerilme
+  // [1] Stress
   html += `<div class="check-row">
     <div class="check-header">
-      <span class="check-name">[1] Gerilme Kontrolü</span>
+      <span class="check-name">${t("checkStress")}</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:10px;color:${barColor(r.stress.util)};font-family:var(--mono)">${r.stress.util}%</span>
         ${badge(r.stress.ok)}
@@ -679,33 +858,33 @@ function renderResults(r) {
 
   html += `<hr class="divider">`;
 
-  // [2] Ayırma
+  // [2] Separation
   html += `<div class="check-row">
     <div class="check-header">
-      <span class="check-name">[2] Ayırma Kontrolü</span>
+      <span class="check-name">${t("checkSep")}</span>
       ${badge(r.sep.ok)}
     </div>
     <div class="check-detail" style="color:var(--muted)">
-      Marj = <span style="color:${r.sep.margin >= 0 ? '#16a34a':'#dc2626'}">${r.sep.margin > 0 ? '+':'' }${r.sep.margin} N</span>
+      ${t("margin")} = <span style="color:${r.sep.margin >= 0 ? '#16a34a':'#dc2626'}">${r.sep.margin > 0 ? '+':'' }${r.sep.margin} N</span>
     </div>
     <div class="check-sub-grid">
       <div class="check-sub">
-        <div class="check-sub-label">TOPLAM ÖN YÜK</div>
+        <div class="check-sub-label">${t("totalPreload")}</div>
         <div class="check-sub-val" style="color:var(--green)">${(r.sep.total/1000).toFixed(2)} kN</div>
       </div>
       <div class="check-sub">
-        <div class="check-sub-label">BASINÇ KUVVETİ</div>
+        <div class="check-sub-label">${t("pressureForce")}</div>
         <div class="check-sub-val" style="color:var(--amber)">${(r.sep.fp/1000).toFixed(2)} kN</div>
       </div>
     </div>
   </div>`;
 
-  // [3] Sızdırmazlık
+  // [3] Sealing
   if (r.sealing) {
     html += `<hr class="divider">
     <div class="check-row">
       <div class="check-header">
-        <span class="check-name">[3] Sızdırmazlık Kontrolü</span>
+        <span class="check-name">${t("checkSealing")}</span>
         ${badge(r.sealing.ok)}
       </div>
       <div class="check-detail" style="color:var(--muted)">
@@ -714,11 +893,11 @@ function renderResults(r) {
       </div>
       <div class="check-sub-grid">
         <div class="check-sub">
-          <div class="check-sub-label">CONTA ALANI</div>
+          <div class="check-sub-label">${t("gasketArea")}</div>
           <div class="check-sub-val">${r.sealing.area} mm²</div>
         </div>
         <div class="check-sub">
-          <div class="check-sub-label">CONTA GERİLMESİ</div>
+          <div class="check-sub-label">${t("gasketStress")}</div>
           <div class="check-sub-val" style="color:${r.sealing.ok?'var(--green)':'var(--red)'}">${r.sealing.stress} MPa</div>
         </div>
       </div>
@@ -730,11 +909,11 @@ function renderResults(r) {
     html += `<hr class="divider">
     <div class="check-row">
       <div class="check-header">
-        <span class="check-name">[4] Cıvata Aralığı Kontrolü</span>
+        <span class="check-name">${t("checkSpacing")}</span>
         ${badge(r.design.spacing.ok)}
       </div>
       <div class="check-detail" style="color:var(--muted)">
-        Aralık = <span style="color:var(--text)">${r.design.spacing.spacing}</span> mm
+        ${currentLang === "tr" ? "Aralık" : "Spacing"} = <span style="color:var(--text)">${r.design.spacing.spacing}</span> mm
         &nbsp;≥&nbsp; min <span style="color:var(--text)">${r.design.spacing.minimum}</span> mm
       </div>
     </div>`;
@@ -745,11 +924,11 @@ function renderResults(r) {
   // ── Design results
   if (r.design) {
     html += `<div class="checks-block">
-      <div class="checks-title">🔧 Design Mode Sonuçları</div>
+      <div class="checks-title">${t("designTitle")}</div>
       <div class="grid3">
-        ${mc("Minimum n (ham)", r.design.n_min, "adet", "#d97706")}
-        ${mc("Seçilen n",       r.design.n_selected, "adet", "#16a34a")}
-        ${r.design.spacing ? mc("Hesaplanan Aralık", r.design.spacing.spacing, "mm", r.design.spacing.ok ? "#16a34a":"#dc2626") : ""}
+        ${mc(t("mcMinN"),        r.design.n_min,      t("unitPcs"), "#d97706")}
+        ${mc(t("mcSelN"),        r.design.n_selected, t("unitPcs"), "#16a34a")}
+        ${r.design.spacing ? mc(t("mcCalcSpacing"), r.design.spacing.spacing, "mm", r.design.spacing.ok ? "#16a34a":"#dc2626") : ""}
       </div>
     </div>`;
   }
@@ -765,6 +944,7 @@ function mc(label, value, unit, accent) {
 }
 
 // ── Init
+applyTranslations();
 updateBoltInfo();
 </script>
 </body>
