@@ -81,7 +81,21 @@ Once the analysis runs, the right panel displays:
 
 ## 📋 User Manual
 
-For full parameter descriptions, worked examples, and formula derivations, refer to `ClampForce v1.0 Kullanıcı Kılavuzu.docx`.
+For full parameter descriptions, worked examples, and formula derivations, refer to `ClampForce v1.0 User Manual.pdf`.
+
+---
+
+## Validation Report
+
+ClampForce v1.0 has been verified against hand-calculated analytical reference values per VDI 2230 and EN 1591-1:2013 standards. Three independent scenarios were tested; all results showed full agreement.
+
+| # | Scenario | Mode | Feature | Result | Match |
+|---|---|---|---|---|---|
+| 1 | Basic Flange | CHECK | Fixed C, n=8 | ACCEPTABLE | ✓ FULL |
+| 2 | Steel/Al. Flange | CHECK | VDI φ + Thermal | NOT ACCEPTABLE | ✓ FULL |
+| 3 | High-Pressure Flange | DESIGN | Sealing + Spacing | ACCEPTABLE, n=4 | ✓ FULL |
+
+> The NOT ACCEPTABLE result in Scenario 2 is intentional: it demonstrates how thermally induced preload increase can critically compromise joint integrity. For the full report, refer to `ClampForce v1.0 Validation Report.pdf`.
 
 ---
 

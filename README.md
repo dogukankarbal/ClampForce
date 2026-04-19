@@ -81,7 +81,21 @@ Analiz çalıştırıldığında sağ panelde şunlar belirir:
 
 ## 📋 Detaylı Kullanıcı Kılavuzu
 
-Tam açıklamalar, örnek senaryo ve formüller için `ClampForce v1.0 Kullanıcı Kılavuzu.docx` dosyasına bakın.
+Tam açıklamalar, örnek senaryo ve formüller için `ClampForce v1.0 Kullanıcı Kılavuzu.pdf` dosyasına bakın.
+
+---
+
+## Validasyon Raporu
+
+ClampForce v1.0, VDI 2230 ve EN 1591-1:2013 standartlarına göre elle hesaplanan analitik referans değerleriyle karşılaştırılarak doğrulanmıştır. 3 bağımsız senaryo test edilmiş; tüm sonuçlar tam uyum göstermiştir.
+
+| # | Senaryo | Mod | Özellik | Sonuç | Uyum |
+|---|---|---|---|---|---|
+| 1 | Temel Flans | CHECK | Sabit C, n=8 | ACCEPTABLE | ✓ TAM |
+| 2 | Çelik/Al. Flans | CHECK | VDI φ + Termal | NOT ACCEPTABLE | ✓ TAM |
+| 3 | Yüksek Basınç Flans | DESIGN | Sızdırmazlık + Aralık | ACCEPTABLE, n=4 | ✓ TAM |
+
+> Senaryo 2'nin NOT ACCEPTABLE çıkması kasıtlıdır: termal yük kaynaklı preload artışının tasarımı nasıl kritik düzeyde etkileyebildiğini göstermektedir. Tam rapor için `ClampForce v1.0 Validasyon Raporu.pdf` dosyasına bakın.
 
 ---
 
